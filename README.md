@@ -3,7 +3,7 @@
 Private RealWorld (Conduit) frontend for agent demos. This repository is a copy of [yurisldk/realworld-react-fsd](https://github.com/yurisldk/realworld-react-fsd) (MIT). Pair it with the ASP.NET Core API in [example-app-backend](https://github.com/12masta/example-app-backend).
 
 - Frontend: `http://localhost:30401`
-- Backend API: `http://localhost:5000/api`
+- Backend API: `http://localhost:5080/api`
 
 # 🙌 RealWorld example app 🍰 Feature-Sliced Design
 
@@ -105,7 +105,7 @@ yarn start
 ```
 
 - Frontend: `http://localhost:30401`
-- Backend API: `http://localhost:5000/api`
+- Backend API: `http://localhost:5080/api`
 
 [^1]:
     This assumes the GraphViz `dot` command is available - on most linux and
@@ -122,7 +122,7 @@ docker compose --env-file .env.compose up -d --build
 ```
 
 - Frontend: <http://localhost:30401>
-- Backend API is expected separately at <http://localhost:5000>
+- Backend API is expected separately at <http://localhost:5080>
 
 For backend integration, see [example-app-backend](https://github.com/12masta/example-app-backend).
 
