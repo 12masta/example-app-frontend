@@ -12,7 +12,10 @@ import { validateSchema } from '~shared/api/validateSchema';
 
 export async function userUpdateAction({ request }: ActionFunctionArgs<RouterContextProvider>) {
   const formData = await request.formData();
-  const validation = validateSchema(UpdateCurrentUserBody, { user: Object.fromEntries(formData) });
+  const fields = Object.fromEntries(formData);
+  const { password, ...fieldsWithoutPassword } = fields;
+  const user = String(password ?? '').trim() === '' ? fieldsWithoutPassword : fields;
+  const validation = validateSchema(UpdateCurrentUserBody, { user });
 
   if (!validation.ok) {
     return validation;
