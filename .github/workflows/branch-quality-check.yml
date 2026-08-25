@@ -3,16 +3,12 @@ name: Branch Quality Check
 on:
   push:
     branches:
+      - main
       - master
       - develop
-      - 'feature/**'
-      - 'bugfix/**'
-      - 'hotfix/**'
-      - 'release/**'
-  pull_request:
-    branches:
-      - master
-      - develop
+
+permissions:
+  contents: read
 
 jobs:
   code-quality-and-build:
