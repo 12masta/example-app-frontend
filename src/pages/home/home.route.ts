@@ -23,5 +23,12 @@ export const homeRoute = {
         return { action };
       },
     },
+    {
+      path: homePaths.followToggle,
+      lazy: async () => {
+        const { profileFollowToggleAction: action } = await import('~pages/home/actions/profile-follow-toggle.action');
+        return { action };
+      },
+    },
   ],
 } satisfies RouteObject;
