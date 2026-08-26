@@ -37,7 +37,7 @@ Local development:
 yarn start
 ```
 
-End-to-end coverage lives in `example-app-e2e`. After merge to `main`, this repo calls that reusable workflow.
+End-to-end tests live in `example-app-e2e`. After merge to `main`, this repo calls that workflow with `coverage: true` (mutated API harness). Real e2e, without that mutation, is scheduled in the e2e repo. Unit coverage is the Jest job in this pipeline. Do not start Playwright from frontend CI.
 
 ## Development Practices
 

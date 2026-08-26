@@ -8,8 +8,41 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Lint, test, and build
+  unit-coverage:
+    name: Unit coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate API artifacts
+        run: yarn generate
+
+      - name: Run unit tests
+        run: yarn test --ci --watchAll=false
+
+      - name: Upload Jest coverage
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-lcov
+          path: coverage/lcov.info
+          if-no-files-found: error
+          retention-days: 14
+
+  lint-and-build:
+    name: Lint and build
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -31,9 +64,6 @@ jobs:
 
       - name: Lint
         run: yarn exec eslint src --ext ts,tsx --max-warnings=0
-
-      - name: Run unit tests
-        run: yarn test --ci --watchAll=false
 
       - name: Build production bundle
         run: yarn build:prod
