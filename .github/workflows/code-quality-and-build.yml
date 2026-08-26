@@ -35,5 +35,14 @@ jobs:
       - name: Run unit tests
         run: yarn test --ci --watchAll=false
 
+      - name: Upload Jest coverage
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-lcov
+          path: coverage/lcov.info
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Build production bundle
         run: yarn build:prod

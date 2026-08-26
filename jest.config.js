@@ -27,7 +27,13 @@ module.exports = {
   },
   testMatch: ['<rootDir>/src/**/*.{spec,test}.{ts,tsx,js,jsx}'],
   collectCoverage: true,
-  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/shared/api/generated/**',
+    '!src/shared/lib/test/**',
+    '!**/*.{spec,test}.*',
+  ],
   coverageDirectory: '<rootDir>/coverage',
   coverageReporters: ['text', 'lcov'],
 };
