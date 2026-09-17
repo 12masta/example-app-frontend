@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { IoHeart } from 'react-icons/io5';
+import { IoAdd, IoHeart, IoRemove } from 'react-icons/io5';
 import { Await, Link, useFetcher, useLoaderData, useLocation } from 'react-router';
 import type { ArticlePreview } from '~shared/api/generated/schemas/articlePreview.zod';
 import type { GetArticlesParams } from '~shared/api/generated/schemas/getArticlesParams.zod';
@@ -120,7 +120,7 @@ type HomeArticlePreviewCardProps = {
 
 function HomeArticlePreviewCard({ article }: HomeArticlePreviewCardProps) {
   const { author, updatedAt, slug, title, description, tagList } = article;
-  const { username, image } = author;
+  const { username, image, following } = author;
 
   return (
     <div className="article-preview" data-test="article-preview">
@@ -137,6 +137,7 @@ function HomeArticlePreviewCard({ article }: HomeArticlePreviewCardProps) {
           <span className="date">{formatDate(updatedAt)}</span>
         </div>
 
+        <HomeFollowButton slug={slug} username={username} following={following} />
         <HomeFavoriteButton article={article} />
       </div>
 
@@ -153,6 +154,47 @@ function HomeArticlePreviewCard({ article }: HomeArticlePreviewCardProps) {
         </ul>
       </Link>
     </div>
+  );
+}
+
+type HomeFollowButtonProps = {
+  slug: string;
+  username: string;
+  following: boolean;
+};
+
+function HomeFollowButton({ slug, username, following }: HomeFollowButtonProps) {
+  const followToggleFetcher = useFetcher({ key: `home-follow-toggle-${slug}-${username}` });
+  const optimisticOperation = followToggleFetcher.formData?.get('operation');
+
+  let isFollowing = following;
+
+  if (optimisticOperation === 'follow') {
+    isFollowing = true;
+  }
+
+  if (optimisticOperation === 'unfollow') {
+    isFollowing = false;
+  }
+
+  const handleFollowToggle = () => {
+    const operation = isFollowing ? 'unfollow' : 'follow';
+    const formData = new FormData();
+    formData.set('operation', operation);
+    formData.set('username', username);
+    followToggleFetcher.submit(formData, { method: 'post', action: homePaths.getFollowTogglePath(slug) });
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleFollowToggle}
+      aria-label={isFollowing ? 'Unfollow author' : 'Follow author'}
+      className={isFollowing ? 'btn btn-sm btn-secondary' : 'btn btn-sm btn-outline-secondary'}
+    >
+      {isFollowing ? <IoRemove size={14} /> : <IoAdd size={14} />}
+      &nbsp; {isFollowing ? 'Unfollow' : 'Follow'} {username}
+    </button>
   );
 }
 
