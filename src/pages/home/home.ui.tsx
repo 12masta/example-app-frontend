@@ -5,6 +5,7 @@ import type { ArticlePreview } from '~shared/api/generated/schemas/articlePrevie
 import type { GetArticlesParams } from '~shared/api/generated/schemas/getArticlesParams.zod';
 import type { MultipleArticlesResponse } from '~shared/api/generated/schemas/multipleArticlesResponse.zod';
 import { formatDate } from '~shared/lib/date';
+import { canSubmitArticleFavorite } from '~shared/lib/favorite/own-article-favorite';
 import { AsyncErrorCard } from '~shared/ui/async-error-card/async-error-card.ui';
 import { Spinner } from '~shared/ui/spinner/spinner.ui';
 import type { HomePageLoaderData } from './home.loader';
@@ -161,9 +162,11 @@ type HomeFavoriteButtonProps = {
 };
 
 function HomeFavoriteButton({ article }: HomeFavoriteButtonProps) {
-  const { slug, favorited, favoritesCount } = article;
+  const { userData } = useLoaderData<HomePageLoaderData>();
+  const { slug, favorited, favoritesCount, author } = article;
   const favoriteToggleFetcher = useFetcher({ key: `article-favorite-toggle-${slug}` });
   const optimisticOperation = favoriteToggleFetcher.formData?.get('operation');
+  const isOwnArticle = !canSubmitArticleFavorite(userData?.user?.username, author.username);
 
   let isFavorited = favorited;
 
@@ -178,6 +181,7 @@ function HomeFavoriteButton({ article }: HomeFavoriteButtonProps) {
   const optimisticFavoritesCount = favoritesCount + Number(isFavorited) - Number(favorited);
 
   const handleFavoriteToggle = () => {
+    if (isOwnArticle) return;
     const operation = isFavorited ? 'unfavorite' : 'favorite';
     const formData = new FormData();
     formData.set('operation', operation);
@@ -189,6 +193,7 @@ function HomeFavoriteButton({ article }: HomeFavoriteButtonProps) {
       type="button"
       onClick={handleFavoriteToggle}
       aria-label={isFavorited ? 'Unfavorite article' : 'Favorite article'}
+      aria-disabled={isOwnArticle || undefined}
       className={isFavorited ? 'btn btn-sm pull-xs-right btn-primary' : 'btn btn-sm pull-xs-right btn-outline-primary'}
     >
       <IoHeart size={14} />

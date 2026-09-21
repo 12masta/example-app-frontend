@@ -4,6 +4,7 @@ import { Await, Link, useFetcher, useLoaderData, useParams } from 'react-router'
 import type { MultipleCommentsResponse } from '~shared/api/generated/schemas/multipleCommentsResponse.zod';
 import type { SingleArticleResponse } from '~shared/api/generated/schemas/singleArticleResponse.zod';
 import { formatDate } from '~shared/lib/date';
+import { canSubmitArticleFavorite } from '~shared/lib/favorite/own-article-favorite';
 import { AsyncErrorCard } from '~shared/ui/async-error-card/async-error-card.ui';
 import { ErrorMessages } from '~shared/ui/error-messages/error-messages.ui';
 import { Spinner } from '~shared/ui/spinner/spinner.ui';
@@ -100,7 +101,7 @@ function ArticleActionsBlock({ article }: ArticleActionsBlockProps) {
         <>
           <FollowAuthorButton username={username} following={following} />
           &nbsp;
-          <FavoriteArticleButton favorited={favorited} favoritesCount={favoritesCount} />
+          <FavoriteArticleButton favorited={favorited} favoritesCount={favoritesCount} authorUsername={username} />
         </>
       )}
       {isAuthor && (
@@ -158,13 +159,16 @@ function FollowAuthorButton({ username, following }: FollowAuthorButtonProps) {
 type FavoriteArticleButtonProps = {
   favorited: boolean;
   favoritesCount: number;
+  authorUsername: string;
 };
 
-function FavoriteArticleButton({ favorited, favoritesCount }: FavoriteArticleButtonProps) {
+function FavoriteArticleButton({ favorited, favoritesCount, authorUsername }: FavoriteArticleButtonProps) {
   const { slug = '' } = useParams();
+  const { userData } = useLoaderData<ArticlePageLoaderData>();
 
   const favoriteToggleFetcher = useFetcher({ key: `article-favorite-toggle-${slug}` });
   const optimisticOperation = favoriteToggleFetcher.formData?.get('operation');
+  const isOwnArticle = !canSubmitArticleFavorite(userData?.user?.username, authorUsername);
 
   let isFavorited = favorited;
 
@@ -179,6 +183,7 @@ function FavoriteArticleButton({ favorited, favoritesCount }: FavoriteArticleBut
   const optimisticFavoritesCount = favoritesCount + Number(isFavorited) - Number(favorited);
 
   const handleFavoriteToggle = () => {
+    if (isOwnArticle) return;
     const operation = isFavorited ? 'unfavorite' : 'favorite';
     const formData = new FormData();
     formData.set('operation', operation);
@@ -190,6 +195,7 @@ function FavoriteArticleButton({ favorited, favoritesCount }: FavoriteArticleBut
       type="button"
       onClick={handleFavoriteToggle}
       aria-label={isFavorited ? 'Unfavorite article' : 'Favorite article'}
+      aria-disabled={isOwnArticle || undefined}
       className={isFavorited ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary'}
     >
       <IoHeart size={16} />
