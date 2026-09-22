@@ -83,8 +83,24 @@ function EditorForm({ article }: EditorFormProps) {
                     defaultValue={tagListText}
                   />
                 </fieldset>
-                <button className="btn btn-lg pull-xs-right btn-primary" type="submit" disabled={isSubmitting}>
+                <button
+                  className="btn btn-lg pull-xs-right btn-primary"
+                  type="submit"
+                  name="intent"
+                  value="publish"
+                  disabled={isSubmitting}
+                >
                   Publish Article
+                </button>
+                <button
+                  className="btn btn-lg pull-xs-right btn-outline-secondary"
+                  type="submit"
+                  name="intent"
+                  value="draft"
+                  disabled={isSubmitting}
+                  style={{ marginRight: '0.5rem' }}
+                >
+                  Save draft
                 </button>
               </fieldset>
             </Form>

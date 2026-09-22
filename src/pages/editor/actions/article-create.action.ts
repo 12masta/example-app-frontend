@@ -20,9 +20,14 @@ function parseTags(value: FormDataEntryValue | null) {
 
 export async function articleCreateAction({ request }: ActionFunctionArgs<RouterContextProvider>) {
   const formData = await request.formData();
-  const fields = Object.fromEntries(formData);
   const validation = validateSchema(CreateArticleBody, {
-    article: { ...fields, tagList: parseTags(fields.tagList) },
+    article: {
+      title: String(formData.get('title') ?? ''),
+      description: String(formData.get('description') ?? ''),
+      body: String(formData.get('body') ?? ''),
+      tagList: parseTags(formData.get('tagList')),
+      isDraft: formData.get('intent') === 'draft',
+    },
   });
 
   if (!validation.ok) {

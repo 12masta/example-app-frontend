@@ -2,6 +2,7 @@ import { replace } from 'react-router';
 import type { LoaderFunctionArgs, RouterContextProvider } from 'react-router';
 import { getGetArticlesQueryOptions } from '~shared/api/generated/fetch/articles/articles';
 import { getGetProfileByUsernameQueryOptions } from '~shared/api/generated/fetch/profile/profile';
+import type { GetArticlesParams } from '~shared/api/generated/schemas/getArticlesParams.zod';
 import { queryClient } from '~shared/api/queryClient';
 import { userContext } from '~shared/lib/react-router/userContext';
 import { getProfileNavigation, parseProfileSearchParams, toProfileSearch } from './profile.state';
@@ -26,8 +27,15 @@ export async function profilePageLoader({ request, params, context }: LoaderFunc
     .fetchQuery(getGetProfileByUsernameQueryOptions(params.username, { request: { signal: request.signal } }))
     .then((response) => response.data);
 
+  const articleQueryParams: GetArticlesParams = {
+    limit: normalizedSearchParams.limit,
+    offset: normalizedSearchParams.offset,
+    ...(normalizedSearchParams.author ? { author: normalizedSearchParams.author } : {}),
+    ...(normalizedSearchParams.favorited ? { favorited: normalizedSearchParams.favorited } : {}),
+  };
+
   const articlesPromise = queryClient
-    .fetchQuery(getGetArticlesQueryOptions(normalizedSearchParams, { request: { signal: request.signal } }))
+    .fetchQuery(getGetArticlesQueryOptions(articleQueryParams, { request: { signal: request.signal } }))
     .then((response) => response.data);
 
   return {

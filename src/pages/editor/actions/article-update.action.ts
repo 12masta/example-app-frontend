@@ -25,9 +25,14 @@ export async function articleUpdateAction({ request, params }: ActionFunctionArg
 
   const { slug } = params;
   const formData = await request.formData();
-  const fields = Object.fromEntries(formData);
   const validation = validateSchema(UpdateArticleBody, {
-    article: { ...fields, tagList: parseTags(fields.tagList) },
+    article: {
+      title: String(formData.get('title') ?? ''),
+      description: String(formData.get('description') ?? ''),
+      body: String(formData.get('body') ?? ''),
+      tagList: parseTags(formData.get('tagList')),
+      isDraft: formData.get('intent') === 'draft',
+    },
   });
 
   if (!validation.ok) {

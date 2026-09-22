@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { IoAdd, IoHeart, IoRemove, IoSettingsSharp } from 'react-icons/io5';
 import { Await, Link, useFetcher, useLoaderData, useLocation, useParams } from 'react-router';
 import type { ArticlePreview } from '~shared/api/generated/schemas/articlePreview.zod';
-import type { GetArticlesParams } from '~shared/api/generated/schemas/getArticlesParams.zod';
 import type { MultipleArticlesResponse } from '~shared/api/generated/schemas/multipleArticlesResponse.zod';
 import type { ProfileResponse } from '~shared/api/generated/schemas/profileResponse.zod';
 import { formatDate } from '~shared/lib/date';
@@ -10,7 +9,7 @@ import { AsyncErrorCard } from '~shared/ui/async-error-card/async-error-card.ui'
 import { Spinner } from '~shared/ui/spinner/spinner.ui';
 import type { ProfilePageLoaderData } from './profile.loader';
 import { profilePaths } from './profile.paths';
-import { getProfileArticlesLink, getProfileFavoritedLink } from './profile.state';
+import { getProfileArticlesLink, getProfileDraftsLink, getProfileFavoritedLink } from './profile.state';
 
 export function ProfilePage() {
   const { profilePromise } = useLoaderData<ProfilePageLoaderData>();
@@ -115,7 +114,8 @@ function ProfileFollowButton({ profile }: ProfileFollowButtonProps) {
 
 function ProfileFeed() {
   const { username = '' } = useParams();
-  const { articlesPromise, searchParams, navigation } = useLoaderData<ProfilePageLoaderData>();
+  const { articlesPromise, searchParams, navigation, userData } = useLoaderData<ProfilePageLoaderData>();
+  const isOwnProfile = userData?.user?.username === username;
 
   return (
     <>
@@ -131,6 +131,19 @@ function ProfileFeed() {
               My Articles
             </Link>
           </li>
+
+          {isOwnProfile && (
+            <li className="nav-item">
+              <Link
+                className={navigation.isDraftsFeedActive ? 'nav-link active' : 'nav-link'}
+                to={{ search: getProfileDraftsLink(searchParams, username) }}
+                replace
+                aria-current={navigation.isDraftsFeedActive ? 'page' : undefined}
+              >
+                Drafts
+              </Link>
+            </li>
+          )}
 
           <li className="nav-item">
             <Link
@@ -152,6 +165,7 @@ function ProfileFeed() {
               articles={articlesData.articles}
               articlesCount={articlesData.articlesCount}
               searchParams={searchParams}
+              draftsOnly={Boolean(searchParams.drafts)}
             />
           )}
         </Await>
@@ -163,21 +177,25 @@ function ProfileFeed() {
 type ProfileArticlesListProps = {
   articles: MultipleArticlesResponse['articles'];
   articlesCount: MultipleArticlesResponse['articlesCount'];
-  searchParams: GetArticlesParams;
+  searchParams: ReturnType<typeof useLoaderData<ProfilePageLoaderData>>['searchParams'];
+  draftsOnly: boolean;
 };
 
-function ProfileArticlesList({ articles, articlesCount, searchParams }: ProfileArticlesListProps) {
-  if (articlesCount === 0) {
+function ProfileArticlesList({ articles, articlesCount, searchParams, draftsOnly }: ProfileArticlesListProps) {
+  const visibleArticles = draftsOnly ? articles.filter((article) => article.isDraft) : articles;
+  const visibleCount = draftsOnly ? visibleArticles.length : articlesCount;
+
+  if (visibleCount === 0) {
     return <div className="article-preview">No articles are here... yet.</div>;
   }
 
   return (
     <>
-      {articles.map((article) => (
+      {visibleArticles.map((article) => (
         <ProfileArticlePreviewCard key={article.slug} article={article} />
       ))}
 
-      <ProfileArticleListPagination searchParams={searchParams} articlesCount={articlesCount} />
+      {!draftsOnly && <ProfileArticleListPagination searchParams={searchParams} articlesCount={articlesCount} />}
     </>
   );
 }
@@ -271,7 +289,7 @@ function ProfileFavoriteButton({ article }: ProfileFavoriteButtonProps) {
 }
 
 type ProfileArticleListPaginationProps = {
-  searchParams: GetArticlesParams;
+  searchParams: { limit: number; offset: number };
   articlesCount: number;
 };
 
