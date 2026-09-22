@@ -37,13 +37,23 @@ type ArticleContentProps = {
 };
 
 function ArticleContent({ article }: ArticleContentProps) {
-  const { title, body, tagList } = article;
+  const { title, body, tagList, isDraft } = article;
 
   return (
     <>
       <div className="banner">
         <div className="container">
-          <h1>{title}</h1>
+          <h1>
+            {title}
+            {isDraft ? (
+              <>
+                {' '}
+                <span className="badge bg-secondary" style={{ fontSize: '0.45em', verticalAlign: 'middle' }}>
+                  Draft
+                </span>
+              </>
+            ) : null}
+          </h1>
           <ArticleActionsBlock article={article} />
         </div>
       </div>

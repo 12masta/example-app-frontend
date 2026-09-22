@@ -760,6 +760,7 @@ components:
         - description
         - favorited
         - favoritesCount
+        - isDraft
         - slug
         - tagList
         - title
@@ -788,6 +789,8 @@ components:
           type: boolean
         favoritesCount:
           type: integer
+        isDraft:
+          type: boolean
         author:
           $ref: '#/components/schemas/Profile'
     NewArticle:
@@ -807,6 +810,8 @@ components:
           type: array
           items:
             type: string
+        isDraft:
+          type: boolean
     UpdateArticle:
       type: object
       properties:
@@ -820,6 +825,8 @@ components:
           type: array
           items:
             type: string
+        isDraft:
+          type: boolean
     Comment:
       required:
         - author
@@ -911,6 +918,7 @@ components:
         - description
         - favorited
         - favoritesCount
+        - isDraft
         - slug
         - tagList
         - title
@@ -937,6 +945,8 @@ components:
           type: boolean
         favoritesCount:
           type: integer
+        isDraft:
+          type: boolean
         author:
           $ref: '#/components/schemas/Profile'
     UserResponse:

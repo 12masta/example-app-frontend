@@ -16,6 +16,7 @@ const PaginationSchema = zod.object({
 const ProfileArticleFilterSchema = zod.object({
   author: zod.catch(zod.optional(NonEmptyStringSchema), undefined),
   favorited: zod.catch(zod.optional(NonEmptyStringSchema), undefined),
+  drafts: zod.catch(zod.optional(NonEmptyStringSchema), undefined),
 });
 
 type ProfileSearchParams = {
@@ -23,6 +24,7 @@ type ProfileSearchParams = {
   offset: number;
   author?: string;
   favorited?: string;
+  drafts?: boolean;
 };
 
 export function parseProfileSearchParams(searchParams: URLSearchParams, username: string): ProfileSearchParams {
@@ -34,7 +36,12 @@ export function parseProfileSearchParams(searchParams: URLSearchParams, username
   const filter = ProfileArticleFilterSchema.parse({
     author: searchParams.get('author') ?? undefined,
     favorited: searchParams.get('favorited') ?? undefined,
+    drafts: searchParams.get('drafts') ?? undefined,
   });
+
+  if (filter.drafts === '1' || filter.drafts === 'true') {
+    return { ...pagination, author: username, drafts: true };
+  }
 
   if (filter.favorited) {
     return { ...pagination, favorited: filter.favorited };
@@ -61,6 +68,10 @@ export function toProfileSearch(params: ProfileSearchParams) {
     nextSearchParams.set('favorited', params.favorited);
   }
 
+  if (params.drafts) {
+    nextSearchParams.set('drafts', '1');
+  }
+
   const nextSearch = nextSearchParams.toString();
   return nextSearch ? `?${nextSearch}` : '';
 }
@@ -68,12 +79,14 @@ export function toProfileSearch(params: ProfileSearchParams) {
 type ProfileNavigation = {
   isAuthorFeedActive: boolean;
   isFavoritedFeedActive: boolean;
+  isDraftsFeedActive: boolean;
 };
 
 export function getProfileNavigation(params: ProfileSearchParams): ProfileNavigation {
   return {
-    isAuthorFeedActive: Boolean(params.author),
+    isAuthorFeedActive: Boolean(params.author) && !params.drafts && !params.favorited,
     isFavoritedFeedActive: Boolean(params.favorited),
+    isDraftsFeedActive: Boolean(params.drafts),
   };
 }
 
@@ -83,6 +96,7 @@ export function getProfileArticlesLink(params: ProfileSearchParams, username: st
     offset: 0,
     author: username,
     favorited: undefined,
+    drafts: undefined,
   });
 }
 
@@ -92,5 +106,16 @@ export function getProfileFavoritedLink(params: ProfileSearchParams, username: s
     offset: 0,
     author: undefined,
     favorited: username,
+    drafts: undefined,
+  });
+}
+
+export function getProfileDraftsLink(params: ProfileSearchParams, username: string) {
+  return toProfileSearch({
+    ...params,
+    offset: 0,
+    author: username,
+    favorited: undefined,
+    drafts: true,
   });
 }
