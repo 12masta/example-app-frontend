@@ -62,8 +62,11 @@ export async function apiFetch<T>(url: string, options: RequestInit = {}) {
   const requestUrl = new URL(url, __API_URL__);
   const apiUrl = new URL(__API_URL__);
 
+  // Orval emits absolute http://localhost:3000/... URLs. Replace origin fully
+  // (hostname + port) so production HTTPS hosts do not keep the :3000 port.
   requestUrl.protocol = apiUrl.protocol;
-  requestUrl.host = apiUrl.host;
+  requestUrl.hostname = apiUrl.hostname;
+  requestUrl.port = apiUrl.port;
 
   const response = await fetch(requestUrl.toString(), {
     ...options,

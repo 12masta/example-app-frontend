@@ -5,6 +5,12 @@ Private RealWorld (Conduit) frontend for agent demos. This repository is a copy 
 - Frontend: `http://localhost:30401`
 - Backend API: `http://localhost:5080/api`
 
+## Hosted demo (Azure free tier)
+
+- Frontend: `https://zealous-meadow-098011b03.6.azurestaticapps.net`
+- Backend API: `https://app-example-app-api.azurewebsites.net/api`
+- Deploy: push to `main` or run workflow `Deploy Azure Static Web Apps` (secret `AZURE_STATIC_WEB_APPS_API_TOKEN`; build bakes `API_URL` to the hosted API)
+
 # 🙌 RealWorld example app 🍰 Feature-Sliced Design
 
 A modern implementation of the [RealWorld](https://github.com/gothinkster/realworld) app built with React, TypeScript, React Router, React Query, and Zod.
