@@ -784,6 +784,8 @@ components:
         updatedAt:
           type: string
           format: date-time
+        readingTimeMinutes:
+          type: integer
         favorited:
           type: boolean
         favoritesCount:
@@ -933,6 +935,8 @@ components:
         updatedAt:
           type: string
           format: date-time
+        readingTimeMinutes:
+          type: integer
         favorited:
           type: boolean
         favoritesCount:

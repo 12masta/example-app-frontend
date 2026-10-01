@@ -187,7 +187,7 @@ type ProfileArticlePreviewCardProps = {
 };
 
 function ProfileArticlePreviewCard({ article }: ProfileArticlePreviewCardProps) {
-  const { author, updatedAt, slug, title, description, tagList } = article;
+  const { author, updatedAt, slug, title, description, tagList, readingTimeMinutes } = article;
   const { username: authorUsername, image } = author;
 
   return (
@@ -203,6 +203,11 @@ function ProfileArticlePreviewCard({ article }: ProfileArticlePreviewCardProps) 
           </Link>
 
           <span className="date">{formatDate(updatedAt)}</span>
+          {typeof readingTimeMinutes === 'number' ? (
+            <span className="date" data-test="reading-time">
+              {readingTimeMinutes} min read
+            </span>
+          ) : null}
         </div>
 
         <ProfileFavoriteButton article={article} />
