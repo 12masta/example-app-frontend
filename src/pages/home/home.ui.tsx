@@ -119,7 +119,7 @@ type HomeArticlePreviewCardProps = {
 };
 
 function HomeArticlePreviewCard({ article }: HomeArticlePreviewCardProps) {
-  const { author, updatedAt, slug, title, description, tagList } = article;
+  const { author, updatedAt, slug, title, description, tagList, readingTimeMinutes } = article;
   const { username, image } = author;
 
   return (
@@ -135,6 +135,11 @@ function HomeArticlePreviewCard({ article }: HomeArticlePreviewCardProps) {
           </Link>
 
           <span className="date">{formatDate(updatedAt)}</span>
+          {typeof readingTimeMinutes === 'number' ? (
+            <span className="date" data-test="reading-time">
+              {readingTimeMinutes} min read
+            </span>
+          ) : null}
         </div>
 
         <HomeFavoriteButton article={article} />

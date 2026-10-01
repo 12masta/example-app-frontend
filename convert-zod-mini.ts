@@ -20,6 +20,11 @@ files.forEach((file) => {
     str = str.replace(/(\bzod\.object\([^)]*\))\.optional\(\)/g, 'zod.optional($1)');
     str = str.replace(/(zod\.array\([\s\S]*?\))\.optional\(\)/g, 'zod.optional($1)');
     str = str.replace(/(\bzod\.enum\([^)]*\))\.optional\(\)/g, 'zod.optional($1)');
+    // multiline chains: zod\n\t\t.number()\n\t\t.optional()
+    str = str.replace(/zod\s*\n\s*\.(\w+)\(\)\s*\n\s*\.optional\(\)/g, 'zod.optional(zod.$1())');
+    str = str.replace(/zod\s*\n\s*\.(\w+)\(\)\s*\n\s*\.nullish\(\)/g, 'zod.nullish(zod.$1())');
+    // drop .describe(...) after optional wrappers for zod/mini compatibility
+    str = str.replace(/(\bzod\.(?:optional|nullish)\([^)]+\))\s*\n?\s*\.describe\([^)]*\)/g, '$1');
     return str;
   };
 

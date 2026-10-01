@@ -81,7 +81,7 @@ type ArticleActionsBlockProps = {
 function ArticleActionsBlock({ article }: ArticleActionsBlockProps) {
   const { userData } = useLoaderData<ArticlePageLoaderData>();
 
-  const { createdAt, favorited, favoritesCount = 0, author } = article;
+  const { createdAt, favorited, favoritesCount = 0, author, readingTimeMinutes } = article;
   const { username, following, image } = author;
   const isAuthor = userData?.user?.username === username;
 
@@ -95,6 +95,11 @@ function ArticleActionsBlock({ article }: ArticleActionsBlockProps) {
           {username}
         </Link>
         <span className="date">{formatDate(createdAt)}</span>
+        {typeof readingTimeMinutes === 'number' ? (
+          <span className="date" data-test="reading-time">
+            {readingTimeMinutes} min read
+          </span>
+        ) : null}
       </div>
       {!isAuthor && (
         <>
