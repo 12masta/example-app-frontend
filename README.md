@@ -7,6 +7,8 @@ Private RealWorld (Conduit) frontend for agent demos. This repository is a copy 
 
 ## Hosted demo (Azure free tier)
 
+Deploy pipeline: GitHub Actions `Deploy Azure Static Web Apps` on `main`.
+
 - Frontend: `https://zealous-meadow-098011b03.6.azurestaticapps.net`
 - Backend API: `https://app-example-app-api.azurewebsites.net/api`
 - Deploy: push to `main` or run workflow `Deploy Azure Static Web Apps` (secret `AZURE_STATIC_WEB_APPS_API_TOKEN`; build bakes `API_URL` to the hosted API)
